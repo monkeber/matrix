@@ -48,3 +48,7 @@ script:
       -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
       ..
   - cmake --build . --config ${BUILD_TYPE} -- -j2
+  - |
+    if [ ${ENABLE_TESTING} ]; then
+      ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
+    fi
