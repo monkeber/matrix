@@ -19,17 +19,6 @@ addons:
       - g++-8
     sources:
       - ubuntu-toolchain-r-test
-    script:
-      - cd "${TRAVIS_BUILD_DIR}"
-      - |
-        conan install .. --build=missing \
-          -s build_type=${BUILD_TYPE} \
-          -s compiler.libcxx=libstdc++14
-        - |
-          cmake .. \
-            -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-            -DENABLE_TESTING:BOOL=${ENABLE_TESTING}
-        - cmake --build . --config ${BUILD_TYPE} -- -j2
 
 install:
   # Set up environment variables.
@@ -45,3 +34,15 @@ install:
   - mkdir cmake && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
   - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
   - sudo pip install conan
+
+script:
+  - cd "${TRAVIS_BUILD_DIR}"
+  - |
+    conan install .. --build=missing \
+      -s build_type=${BUILD_TYPE} \
+      -s compiler.libcxx=libstdc++14
+    - |
+      cmake .. \
+        -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+        -DENABLE_TESTING:BOOL=${ENABLE_TESTING}
+    - cmake --build . --config ${BUILD_TYPE} -- -j2
