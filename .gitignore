@@ -1,0 +1,7 @@
+*/build/*
+*/CMakeBuilds
+*/.vs
+.vscode
+*.autosave
+*.json
+*.user
