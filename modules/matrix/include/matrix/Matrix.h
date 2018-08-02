@@ -19,6 +19,7 @@ class Matrix2D
 	// Nested types.
 	//
 public:
+	//! Represents sizes of different dimensions of matrix.
 	struct Dimension
 	{
 		//! Number of rows in the Matrix.
@@ -92,7 +93,7 @@ private:
 	//! Size of the matrix.
 	Dimension sz_;
 	//! Storage for elements of the matrix.
-	//! All elements will be stored in single vector.
+	//! All elements will be stored in a single vector.
 	std::vector<T> elems_;
 };
 
@@ -226,16 +227,16 @@ typename Matrix2D<T>::Row Matrix2D<T>::Slice(const size_t n) const
 
 template<typename T>
 typename Matrix2D<T>::Row Matrix2D<T>::Slice(
-	const size_t n, 
-	const size_t first, 
+	const size_t n,
+	const size_t first,
 	const size_t last) const
 {
-	bool outOfRange = 
-		n < 0 
-		|| n >= sz_.rowsNumber_ 
-		|| first < 0 
-		|| first > sz_.colsNumber_ 
-		|| last < 0 
+	bool outOfRange =
+		n < 0
+		|| n >= sz_.rowsNumber_
+		|| first < 0
+		|| first > sz_.colsNumber_
+		|| last < 0
 		|| last > sz_.colsNumber_;
 
 	if (outOfRange) {
@@ -322,11 +323,11 @@ void PrintMatrix2D(const Matrix2D<T>& mat)
 template<typename T>
 bool operator==(const Matrix2D<T>& left, const Matrix2D<T>& right)
 {
-	if (&left == &right) 
+	if (&left == &right)
 	{
 		return true;
 	}
-	else if (left.GetRows() != right.GetRows() || left.GetColumns() != right.GetColumns()) 
+	else if (left.GetRows() != right.GetRows() || left.GetColumns() != right.GetColumns())
 	{
 		return false;
 	}
@@ -334,7 +335,7 @@ bool operator==(const Matrix2D<T>& left, const Matrix2D<T>& right)
 	return std::equal(left.Begin(), left.End(), right.Begin());
 }
 
-//! Returns matrix where elements are results of 
+//! Returns matrix where elements are results of
 //! resultMat(r, c) = func(left(r, c), right(r, c)).
 template<typename T, typename BinaryOp>
 Matrix2D<T> TransformMatrices(const Matrix2D<T>& left, const Matrix2D<T>& right, BinaryOp func)
@@ -363,4 +364,4 @@ Matrix2D<T> operator-(const Matrix2D<T>& left, const Matrix2D<T>& right)
 	return TransformMatrices(left, right, std::minus<T>());
 }
 
-} // namespace mtx
+}	// namespace mtx
