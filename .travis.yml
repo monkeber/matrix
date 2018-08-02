@@ -7,7 +7,7 @@ matrix:
   include:
 
     #
-    # GCC 8 Release
+    # GCC 7 Release
     #
   - os: linux
     compiler: gcc
@@ -15,15 +15,15 @@ matrix:
     # Set up environment variables.
     env:
       - BUILD_TYPE=Release \
-        CC_COMPILER=gcc-8 \
-        CXX_COMPILER=g++-8 \
+        CC_COMPILER=gcc-7 \
+        CXX_COMPILER=g++-7 \
         ENABLE_TESTING=TRUE
 
     addons:
       apt:
         packages:
-          - gcc-8
-          - g++-8
+          - gcc-7
+          - g++-7
         sources:
           - ubuntu-toolchain-r-test
 
@@ -40,7 +40,7 @@ matrix:
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
 
     #
-    # GCC 8 Debug + Coveralls
+    # GCC 7 Debug + Coveralls
     #
   - os: linux
     compiler: gcc
@@ -48,15 +48,15 @@ matrix:
     # Set up environment variables.
     env:
       - BUILD_TYPE=Debug \
-        CC_COMPILER=gcc-8 \
-        CXX_COMPILER=g++-8 \
+        CC_COMPILER=gcc-7 \
+        CXX_COMPILER=g++-7 \
         ENABLE_TESTING=TRUE
 
     addons:
       apt:
         packages:
-          - gcc-8
-          - g++-8
+          - gcc-7
+          - g++-7
         sources:
           - ubuntu-toolchain-r-test
 
