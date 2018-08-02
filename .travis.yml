@@ -37,6 +37,7 @@ install:
 
 script:
   - cd "${TRAVIS_BUILD_DIR}"
+  - mkdir -p build && cd build
   - |
     conan install .. --build=missing \
       -s build_type=${BUILD_TYPE} \
