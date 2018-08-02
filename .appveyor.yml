@@ -1,0 +1,76 @@
+version: 1.0.{build}
+
+image:
+  - Visual Studio 2017
+
+init:
+  - git config --global core.autocrlf input
+
+skip_commits:
+  files:
+    - '**/*.txt'
+    - '**/*.md'
+    - scripts/**/*
+    - .travis.yml
+
+clone_folder: c:\projects\dev
+
+environment:
+  ENABLE_TESTING: TRUE
+
+matrix:
+  fast_finish: false
+
+platform:
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+install:
+  # Downloading conan.
+  - cmd: set PATH=%PATH%;%PYTHON%/Scripts/
+  - cmd: pip.exe install conan
+  # Create conan data directory.
+  - cmd: conan user
+
+before_build:
+  - cmd: conan --version
+  - cmd: cmake --version
+  - ps: |
+      if ("$env:APPVEYOR_BUILD_WORKER_IMAGE" -eq "Visual Studio 2015") {
+        $env:vs_version=14
+        $env:generator="Visual Studio $env:vs_version 2015"
+      } else {
+        $env:vs_version=15
+        $env:generator="Visual Studio $env:vs_version 2017"
+      }
+      if ($env:PLATFORM -eq "x64") {
+        $env:generator="$env:generator Win64"
+      }
+      Write-Output generator="$env:generator"
+      if ($env:CONFIGURATION -eq "Release") {
+        $env:vs_runtime="MT"
+      } else {
+        $env:vs_runtime="MTd"
+      }
+      Write-Output "Creating a build directory..."
+      (mkdir build) -and (cd build)
+      Write-Output "[Conan] Downloading packages..."
+      conan install .. `
+        --build missing `
+        -s build_type=$env:CONFIGURATION `
+        -s compiler="Visual Studio" `
+        -s compiler.version=$env:vs_version `
+        -s compiler.runtime=$env:vs_runtime
+      Write-Output "[CMake] Generating the project..."
+      cmake .. `
+        -G "$env:generator" `
+        -DENABLE_TESTING:BOOL=$env:ENABLE_TESTING
+
+build_script:
+  - cmake --build . --config %CONFIGURATION%
+
+test_script:
+  - ctest -C %CONFIGURATION% --extra-verbose --parallel %NUMBER_OF_PROCESSORS%
