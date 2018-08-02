@@ -13,6 +13,8 @@ skip_commits:
     - scripts/**/*
     - .travis.yml
 
+clone_folder: c:\projects\dev
+
 environment:
   ENABLE_TESTING: TRUE
 
@@ -65,7 +67,6 @@ before_build:
       Write-Output "[CMake] Generating the project..."
       cmake .. `
         -G "$env:generator" `
-        -DCMAKE_BUILD_TYPE:STRING=%CONFIGURATION% `
         -DENABLE_TESTING:BOOL=$env:ENABLE_TESTING
 
 build_script:
