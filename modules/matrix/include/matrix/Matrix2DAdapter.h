@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matrix/Matrix.h>
+#include "matrix/Matrix.h"
 
 #include <cmath>
 #include <functional>
@@ -12,7 +12,7 @@ namespace mtx
 {
 
 template<typename T>
-class Matrix2DAdapter 
+class Matrix2DAdapter
 	: private Matrix2D<T>
 {
 	//
@@ -35,7 +35,7 @@ public:
 	Matrix2DAdapter& operator=(const Matrix2DAdapter& other);
 
 	//
-	// Public interface. 
+	// Public interface.
 	//
 public:
 	//! Returns number of local minimums in the matrix.
@@ -50,14 +50,14 @@ public:
 	//! Calculates sum of elements situated over the main diagonal.
 	T SumOverMainDiagonal() const;
 
-	// 
+	//
 	// Private methods.
 	//
 private:
 	//! Checks if the specified with row and column element is local minimum of the matrix.
 	bool CheckNeighbors(const size_t row, const size_t column) const;
-	//! Returns vector containig all elements situated n indexes from the edge.
-	//! Function doesn't check whether n is allowed number, you should 
+	//! Returns vector containing all elements situated n indexes from the edge.
+	//! Function doesn't check whether n is allowed number, you should
 	//! check it yourself (floor(smallerDimension/2)).
 	std::vector<T> GetCycle(const size_t n) const;
 	//! Replaces cycle n with given vector elements.
@@ -66,14 +66,14 @@ private:
 
 	//
 	// Private data members.
-	// 
+	//
 private:
-	//! Pointer to Matrix for processing.
+	//! Pointer to Matrix object for processing.
 	std::shared_ptr<Matrix2D<T>> matPtr_;
 };
 
 template<typename T>
-Matrix2DAdapter<T>::Matrix2DAdapter(std::shared_ptr<Matrix2D<T>> dataMatrix) 
+Matrix2DAdapter<T>::Matrix2DAdapter(std::shared_ptr<Matrix2D<T>> dataMatrix)
 	: matPtr_{ std::move(dataMatrix) }
 {
 }
@@ -139,7 +139,7 @@ void Matrix2DAdapter<T>::CyclicShift(const size_t step)
 {
 	const size_t rows = matPtr_->GetRows();
 	const size_t columns = matPtr_->GetColumns();
-	const size_t smallerDimension = (rows < columns) ?  rows : columns;
+	const size_t smallerDimension = (rows < columns) ? rows : columns;
 
 	const auto depth = static_cast<size_t>(smallerDimension/2);
 	for (size_t i = 0; i < depth; ++i) 
@@ -173,7 +173,7 @@ int Matrix2DAdapter<T>::LongestIdenticalSet() const
 				++currentLength;
 			}
 
-			if (currentLength > longestSet) 
+			if (currentLength > longestSet)
 			{
 				longestSet = currentLength;
 				number = static_cast<int>(r);
@@ -196,8 +196,8 @@ T Matrix2DAdapter<T>::NonNegativeRowsMultiplication() const
 	{
 		// Check if there are negative elements in the row.
 		bool hasNegativeElems = std::any_of(
-			startOfRow, 
-			startOfRow + columns, 
+			startOfRow,
+			startOfRow + columns,
 			[] (const T& val)
 			{
 				return val < 0;
@@ -230,13 +230,13 @@ T Matrix2DAdapter<T>::SumOverMainDiagonal() const
 		return (*matPtr_)(0, 0);
 	}
 	// Choose size of smaller dimension.
-	const size_t smallerDimension = (rows < columns) ?  rows : columns;
+	const size_t smallerDimension = (rows < columns) ? rows : columns;
 	T sumVal = 0;
 	// Sum elements from main diagonal (not including elements on main diagonal itself)
-	// to end of i row until end of vector is reached.
+	// to the end of i'th row until end of the vector is reached.
 	auto endOfRow = matPtr_->Begin() + columns;
 	const auto endOfVector = matPtr_->End();
-	for (size_t i = 0; i < smallerDimension; ++i) 
+	for (size_t i = 0; i < smallerDimension; ++i)
 	{
 		sumVal += std::accumulate(endOfRow - columns + i + 1, endOfRow, 0);
 		if (endOfRow == endOfVector) {
@@ -254,8 +254,8 @@ bool Matrix2DAdapter<T>::CheckNeighbors(const size_t r, const size_t c) const
 	const size_t rows = matPtr_->GetRows();
 	const size_t columns = matPtr_->GetColumns();
 	const T& currentElement = (*matPtr_)(r, c);
-	// Check neighbors to the left, to the right, above and under 
-	// the given element respectively. 
+	// Check neighbors to the left, to the right, above and under
+	// the given element respectively.
 	if (c > 0 && (*matPtr_)(r, c - 1) <= currentElement) {
 		return false;
 	}
@@ -293,7 +293,7 @@ bool Matrix2DAdapter<T>::CheckNeighbors(const size_t r, const size_t c) const
 }
 
 template<typename T>
-std::vector<T> Matrix2DAdapter<T>::GetCycle(const size_t n) const 
+std::vector<T> Matrix2DAdapter<T>::GetCycle(const size_t n) const
 {
 	const size_t rows = matPtr_->GetRows();
 	const size_t columns = matPtr_->GetColumns();
@@ -310,7 +310,7 @@ std::vector<T> Matrix2DAdapter<T>::GetCycle(const size_t n) const
 		cycleVec.push_back((*matPtr_)(i, columns - n - 1));
 	}
 	// Copy bottom edge.
-	for (size_t i = columns - n - 1; i >= n; --i) 
+	for (size_t i = columns - n - 1; i >= n; --i)
 	{
 		cycleVec.push_back((*matPtr_)(rows - n - 1, i));
 		if (i == 0) {
@@ -342,7 +342,7 @@ void Matrix2DAdapter<T>::SetCycle(const size_t n, std::vector<T> elements)
 		(*matPtr_)(i, columns - n - 1) = elements[vectorElem++];
 	}
 	// Copy bottom edge.
-	for (size_t i = columns - n - 1; i >= n; --i) 
+	for (size_t i = columns - n - 1; i >= n; --i)
 	{
 		(*matPtr_)(rows - n - 1, i) = elements[vectorElem++];
 		if (i == 0) {
@@ -356,4 +356,4 @@ void Matrix2DAdapter<T>::SetCycle(const size_t n, std::vector<T> elements)
 	}
 }
 
-} // namespace mtx
+}	// namespace mtx

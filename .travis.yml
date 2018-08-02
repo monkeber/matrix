@@ -1,0 +1,105 @@
+language: cpp
+
+sudo: required
+dist: trusty
+
+matrix:
+  include:
+
+    #
+    # GCC 8 Release
+    #
+  - os: linux
+    compiler: gcc
+
+    # Set up environment variables.
+    env:
+      - BUILD_TYPE=Release \
+        CC_COMPILER=gcc-8 \
+        CXX_COMPILER=g++-8 \
+        ENABLE_TESTING=TRUE
+
+    addons:
+      apt:
+        packages:
+          - gcc-8
+          - g++-8
+        sources:
+          - ubuntu-toolchain-r-test
+
+    script:
+      - cd "${TRAVIS_BUILD_DIR}"
+      - mkdir -p build && cd build
+      - |
+        conan install .. --build=missing \
+          -s build_type=${BUILD_TYPE}
+      - |
+        cmake \
+          -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+          ..
+      - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
+
+    #
+    # GCC 8 Debug + Coveralls
+    #
+  - os: linux
+    compiler: gcc
+
+    # Set up environment variables.
+    env:
+      - BUILD_TYPE=Debug \
+        CC_COMPILER=gcc-8 \
+        CXX_COMPILER=g++-8 \
+        ENABLE_TESTING=TRUE
+
+    addons:
+      apt:
+        packages:
+          - gcc-8
+          - g++-8
+        sources:
+          - ubuntu-toolchain-r-test
+
+    before_install:
+      - pip install --user cpp-coveralls
+
+    script:
+      - cd "${TRAVIS_BUILD_DIR}"
+      - mkdir -p build && cd build
+      - |
+        conan install .. --build=missing \
+          -s build_type=${BUILD_TYPE}
+      - |
+        cmake \
+          -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+          -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
+          ..
+      - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
+      - |
+        if [ ${ENABLE_TESTING} ]; then
+          ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
+        fi
+
+    after_success:
+      - ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
+      - |
+        # Coveralls - upload the report.
+        cd ..
+        coveralls --build-root build --gcov-options '\-lp' \
+          -E ".*CMakeFiles.*"
+
+install:
+  - export CC=${CC_COMPILER}
+  - export CXX=${CXX_COMPILER}
+  # Install here dependencies.
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p "${DEPS_DIR}" && cd "${DEPS_DIR}"
+
+  - CMAKE_VERSION=3.12.0
+  - CMAKE_ARCH=cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz
+  - CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION::-2}/${CMAKE_ARCH}"
+  - mkdir cmake && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+  - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+
+  - sudo pip install conan
+  - conan user
