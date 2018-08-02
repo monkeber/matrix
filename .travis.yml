@@ -41,8 +41,8 @@ script:
     conan install .. --build=missing \
       -s build_type=${BUILD_TYPE} \
       -s compiler.libcxx=libstdc++14
-    - |
-      cmake .. \
-        -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-        -DENABLE_TESTING:BOOL=${ENABLE_TESTING}
-    - cmake --build . --config ${BUILD_TYPE} -- -j2
+  - |
+    cmake .. \
+      -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+      -DENABLE_TESTING:BOOL=${ENABLE_TESTING}
+  - cmake --build . --config ${BUILD_TYPE} -- -j2
