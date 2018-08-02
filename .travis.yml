@@ -40,8 +40,7 @@ script:
   - mkdir -p build && cd build
   - |
     conan install .. --build=missing \
-      -s build_type=${BUILD_TYPE} \
-      -s compiler.libcxx=libstdc++14
+      -s build_type=${BUILD_TYPE}
   - |
     cmake .. \
       -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
