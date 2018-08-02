@@ -64,7 +64,7 @@ matrix:
       - sudo apt-get update
       - sudo apt-get install python3
       - sudo apt-get -y install python3-pip
-      - pip3 install --user cpp-coveralls
+      - pip3 install --user -U cpp-coveralls
 
     script:
       - cd "${TRAVIS_BUILD_DIR}"
