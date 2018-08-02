@@ -33,7 +33,7 @@ install:
   - CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION::-2}/${CMAKE_ARCH}"
   - mkdir cmake && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
   - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-  - pip install conan
+  - sudo pip install conan
   - conan user
 
 script:
