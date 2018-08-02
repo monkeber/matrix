@@ -81,7 +81,7 @@ matrix:
       - |
         # Coveralls - upload the report.
         cd ..
-        coveralls --build-root build --gcov-options '\-lp' \
+        coveralls --build-root build --verbose --gcov-options '\-lp' \
           -E ".*CMakeFiles.*"
 
 install:
