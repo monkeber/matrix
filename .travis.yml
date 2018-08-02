@@ -75,13 +75,9 @@ matrix:
           -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
           ..
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
-      - |
-        if [ ${ENABLE_TESTING} ]; then
-          ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
-        fi
 
     after_success:
-      - ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
+      - ctest -C ${BUILD_TYPE} --extra-verbose --parallel $(nproc)
       - |
         # Coveralls - upload the report.
         cd ..
