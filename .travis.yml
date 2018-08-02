@@ -3,23 +3,92 @@ language: cpp
 sudo: required
 dist: trusty
 
-os: linux
-compiler: gcc
+matrix:
+  include:
 
-# Set up environment variables.
-env:
-  - BUILD_TYPE=Release \
-    CC_COMPILER=gcc-8 \
-    CXX_COMPILER=g++-8 \
-    ENABLE_TESTING=TRUE
+    #
+    # GCC 8 Release
+    #
+  - os: linux
+    compiler: gcc
 
-addons:
-  apt:
-    packages:
-      - gcc-8
-      - g++-8
-    sources:
-      - ubuntu-toolchain-r-test
+    # Set up environment variables.
+    env:
+      - BUILD_TYPE=Release \
+        CC_COMPILER=gcc-8 \
+        CXX_COMPILER=g++-8 \
+        ENABLE_TESTING=TRUE
+
+    addons:
+      apt:
+        packages:
+          - gcc-8
+          - g++-8
+        sources:
+          - ubuntu-toolchain-r-test
+
+    script:
+      - cd "${TRAVIS_BUILD_DIR}"
+      - mkdir -p build && cd build
+      - |
+        conan install .. --build=missing \
+          -s build_type=${BUILD_TYPE}
+      - |
+        cmake \
+          -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+          ..
+      - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
+
+    #
+    # GCC 8 Debug + Coveralls
+    #
+  - os: linux
+    compiler: gcc
+
+    # Set up environment variables.
+    env:
+      - BUILD_TYPE=Debug \
+        CC_COMPILER=gcc-8 \
+        CXX_COMPILER=g++-8 \
+        ENABLE_TESTING=TRUE \
+        ENABLE_COVERAGE=TRUE
+
+    addons:
+      apt:
+        packages:
+          - gcc-8
+          - g++-8
+        sources:
+          - ubuntu-toolchain-r-test
+
+    before_install:
+      - pip install --user cpp-coveralls
+
+    script:
+      - cd "${TRAVIS_BUILD_DIR}"
+      - mkdir -p build && cd build
+      - |
+        conan install .. --build=missing \
+          -s build_type=${BUILD_TYPE}
+      - |
+        cmake \
+          -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+          -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
+          -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE} \
+          ..
+      - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
+      - |
+        if [ ${ENABLE_TESTING} ]; then
+          ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
+        fi
+
+    after_success:
+      - ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
+      - |
+        # Coveralls - upload the report.
+        cd ..
+        coveralls --build-root build --gcov-options '\-lp' \
+          -E ".*CMakeFiles.*"
 
 install:
   - export CC=${CC_COMPILER}
@@ -36,20 +105,3 @@ install:
 
   - sudo pip install conan
   - conan user
-
-script:
-  - cd "${TRAVIS_BUILD_DIR}"
-  - mkdir -p build && cd build
-  - |
-    conan install .. --build=missing \
-      -s build_type=${BUILD_TYPE}
-  - |
-    cmake \
-      -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-      -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
-      ..
-  - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
-  - |
-    if [ ${ENABLE_TESTING} ]; then
-      ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
-    fi
