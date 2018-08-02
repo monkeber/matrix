@@ -13,6 +13,9 @@ skip_commits:
     - scripts/**/*
     - .travis.yml
 
+environment:
+  ENABLE_TESTING: TRUE
+
 matrix:
   fast_finish: false
 
@@ -60,7 +63,10 @@ before_build:
         -s compiler.version=$env:vs_version `
         -s compiler.runtime=$env:vs_runtime
       Write-Output "[CMake] Generating the project..."
-      cmake .. -G "$env:generator"
+      cmake .. `
+        -G "$env:generator" `
+        -DCMAKE_BUILD_TYPE:STRING=%CONFIGURATION% `
+        -DENABLE_TESTING:BOOL=$env:ENABLE_TESTING
 
 build_script:
   - cmake --build . --config %CONFIGURATION%
