@@ -50,8 +50,7 @@ matrix:
       - BUILD_TYPE=Debug \
         CC_COMPILER=gcc-8 \
         CXX_COMPILER=g++-8 \
-        ENABLE_TESTING=TRUE \
-        ENABLE_COVERAGE=TRUE
+        ENABLE_TESTING=TRUE
 
     addons:
       apt:
@@ -74,7 +73,6 @@ matrix:
         cmake \
           -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
           -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
-          -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE} \
           ..
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
       - |

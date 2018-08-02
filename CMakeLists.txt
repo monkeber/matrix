@@ -5,10 +5,6 @@ project(matrix-task CXX)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-if (ENABLE_COVERAGE)
-	include(Coverage)
-endif ()
-
 add_subdirectory(modules/matrix)
 
 if (ENABLE_TESTING)
