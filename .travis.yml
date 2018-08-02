@@ -33,7 +33,8 @@ install:
   - CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION::-2}/${CMAKE_ARCH}"
   - mkdir cmake && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
   - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-  - sudo pip install conan
+  - pip install conan
+  - conan user
 
 script:
   - cd "${TRAVIS_BUILD_DIR}"
@@ -43,6 +44,7 @@ script:
       -s build_type=${BUILD_TYPE}
   - |
     cmake .. \
+      -G "Unix Makefiles"
       -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
       -DENABLE_TESTING:BOOL=${ENABLE_TESTING}
   - cmake --build . --config ${BUILD_TYPE} -- -j2
