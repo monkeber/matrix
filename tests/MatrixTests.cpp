@@ -1,5 +1,7 @@
-#include <matrix/Matrix.h>
-#include <matrix/Matrix2DAdapter.h>
+#include "matrix/Matrix.h"
+#include "matrix/Matrix2DAdapter.h"
+
+#include "CatchInclude.h"
 
 #include <algorithm>
 #include <cmath>
@@ -9,10 +11,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-// This tells Catch to provide a main() - only do this in one cpp file.
-#define CATCH_CONFIG_MAIN  
-#include "catch.hpp"
 
 TEST_CASE("Matrix has a basic interface", "[Matrix2D]") 
 {

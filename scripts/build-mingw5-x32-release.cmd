@@ -2,16 +2,11 @@
 
 :: Configure build variables.
 set BUILD_CONFIGURATION=release
-set BUILD_ARCH=x64
-set BUILD_DIR=..\build\msvc15-%BUILD_ARCH%
+set BUILD_ARCH=x32
+set BUILD_DIR=..\build\mingw5-%BUILD_ARCH%-%BUILD_CONFIGURATION%
 set ENABLE_TESTS=TRUE
 
-set VS_VERSION=15
-set VS_YEAR=2017
-set VS_ARCH=Win64
-
-:: Check build parent directory
-echo Creating a build directory...
+echo [*] Creating a build directory...
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 
@@ -23,17 +18,15 @@ conan ^
 	install ^
 	..\.. ^
 	-s build_type=Release ^
-	-s compiler="Visual Studio" ^
-	-s compiler.runtime=MT ^
-	-s compiler.version=15 ^
+	-s compiler="gcc" ^
 	-s os=Windows ^
 	--build=missing
 if errorlevel 1 goto :error_conan
 
 :: Run CMake.
-echo [*] Running Cmake
+echo [CMake] Generating project files...
 cmake ^
-	-G "Visual Studio %VS_VERSION% %VS_YEAR% %VS_ARCH%" ^
+	-G "MinGW Makefiles" ^
 	-DCMAKE_BUILD_TYPE:STRING=%BUILD_CONFIGURATION% ^
 	-DENABLE_TESTING:BOOL=%ENABLE_TESTS% ^
 	..\.. 
@@ -54,7 +47,7 @@ if %ENABLE_TESTS% == TRUE (
 	echo [*] Running tests...
 	echo [*] --------------------------------------------------
 
-	ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel %NUMBER_OF_PROCESSORS%
+	ctest --extra-verbose --parallel %NUMBER_OF_PROCESSORS%
 	if errorlevel 1 goto :error_tests
 
 	echo [*] Testing succed!
