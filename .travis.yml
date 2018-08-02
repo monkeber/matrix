@@ -28,7 +28,7 @@ install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir -p "${DEPS_DIR}" && cd "${DEPS_DIR}"
 
-  - CMAKE_VERSION=3.10.0
+  - CMAKE_VERSION=3.12.0
   - CMAKE_ARCH=cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz
   - CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION::-2}/${CMAKE_ARCH}"
   - mkdir cmake && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
