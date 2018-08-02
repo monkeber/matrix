@@ -61,7 +61,7 @@ matrix:
           - ubuntu-toolchain-r-test
 
     before_install:
-      - pip install --user cpp-coveralls
+      - pip3 install --user cpp-coveralls
 
     script:
       - cd "${TRAVIS_BUILD_DIR}"
