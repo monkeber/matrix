@@ -21,12 +21,12 @@ environment:
 matrix:
   fast_finish: false
 
+platform:
+  - x64
+
 configuration:
   - Debug
   - Release
-
-platform:
-  - x64
 
 install:
   # Downloading conan.
