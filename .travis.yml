@@ -7,7 +7,7 @@ matrix:
   include:
 
     #
-    # GCC 8 Release
+    # GCC 7 Release
     #
   - os: linux
     compiler: gcc
@@ -15,15 +15,15 @@ matrix:
     # Set up environment variables.
     env:
       - BUILD_TYPE=Release \
-        CC_COMPILER=gcc-8 \
-        CXX_COMPILER=g++-8 \
+        CC_COMPILER=gcc-7 \
+        CXX_COMPILER=g++-7 \
         ENABLE_TESTING=TRUE
 
     addons:
       apt:
         packages:
-          - gcc-8
-          - g++-8
+          - gcc-7
+          - g++-7
         sources:
           - ubuntu-toolchain-r-test
 
@@ -40,7 +40,7 @@ matrix:
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
 
     #
-    # GCC 8 Debug + Coveralls
+    # GCC 7 Debug + Codecov
     #
   - os: linux
     compiler: gcc
@@ -48,20 +48,18 @@ matrix:
     # Set up environment variables.
     env:
       - BUILD_TYPE=Debug \
-        CC_COMPILER=gcc-8 \
-        CXX_COMPILER=g++-8 \
-        ENABLE_TESTING=TRUE
+        CC_COMPILER=gcc-7 \
+        CXX_COMPILER=g++-7 \
+        ENABLE_TESTING=TRUE \
+        ENABLE_COVERAGE=TRUE
 
     addons:
       apt:
         packages:
-          - gcc-8
-          - g++-8
+          - gcc-7
+          - g++-7
         sources:
           - ubuntu-toolchain-r-test
-
-    before_install:
-      - pip install --user cpp-coveralls
 
     script:
       - cd "${TRAVIS_BUILD_DIR}"
@@ -73,20 +71,13 @@ matrix:
         cmake \
           -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
           -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
+          -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE} \
           ..
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
-      - |
-        if [ ${ENABLE_TESTING} ]; then
-          ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
-        fi
 
     after_success:
-      - ctest -C %BUILD_CONFIGURATION% --extra-verbose --parallel $(nproc)
-      - |
-        # Coveralls - upload the report.
-        cd ..
-        coveralls --build-root build --gcov-options '\-lp' \
-          -E ".*CMakeFiles.*"
+      - ctest -C ${BUILD_TYPE} --extra-verbose --parallel $(nproc)
+      - bash <(curl -s https://codecov.io/bash)
 
 install:
   - export CC=${CC_COMPILER}
