@@ -40,7 +40,7 @@ matrix:
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
 
     #
-    # GCC 7 Debug + Coveralls
+    # GCC 7 Debug + Codecov
     #
   - os: linux
     compiler: gcc
@@ -50,7 +50,8 @@ matrix:
       - BUILD_TYPE=Debug \
         CC_COMPILER=gcc-7 \
         CXX_COMPILER=g++-7 \
-        ENABLE_TESTING=TRUE
+        ENABLE_TESTING=TRUE \
+        ENABLE_COVERAGE=TRUE
 
     addons:
       apt:
@@ -59,9 +60,6 @@ matrix:
           - g++-7
         sources:
           - ubuntu-toolchain-r-test
-
-    before_install:
-      - pip install --user -U cpp-coveralls
 
     script:
       - cd "${TRAVIS_BUILD_DIR}"
@@ -73,16 +71,13 @@ matrix:
         cmake \
           -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
           -DENABLE_TESTING:BOOL=${ENABLE_TESTING} \
+          -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE} \
           ..
       - cmake --build . --config ${BUILD_TYPE} -- -j$(nproc)
 
     after_success:
       - ctest -C ${BUILD_TYPE} --extra-verbose --parallel $(nproc)
-      - |
-        # Coveralls - upload the report.
-        cd ..
-        coveralls --build-root build --verbose --gcov-options '\-lp' \
-          -E ".*CMakeFiles.*"
+      - bash < (curl -s https://codecov.io/bash)
 
 install:
   - export CC=${CC_COMPILER}
