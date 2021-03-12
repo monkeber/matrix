@@ -18,3 +18,5 @@ if (ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(tests)
 endif()
+
+# test change
